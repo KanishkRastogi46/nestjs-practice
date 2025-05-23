@@ -1,34 +1,36 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, Res } from '@nestjs/common';
 import { CoffeesService } from './coffees.service';
+import { CreateCoffeeDto } from './dto/create-coffee.dto/create-coffee.dto';
+import { UpdateCoffeeDto } from './dto/update-coffee.dto/update-coffee.dto';
 
 @Controller('coffees')
 export class CoffeesController {
     constructor (private readonly coffeesService: CoffeesService) {}
     
-    @Get(":coffeeType")
-    findAll(@Param('coffeeType') param) {
-        return `Return the coffee type: ${param}`
+    @Get("")
+    findAll() {
+        return this.coffeesService.findAll();
     }
 
-    @Post("")
+    @Get(":id")
     @HttpCode(HttpStatus.OK)
-    getData(@Body() body) {
-        return body
+    getData(@Param("id") id: string) {
+        return this.coffeesService.findById(Number(id));
+    }
+
+    @Post("create")
+    @HttpCode(HttpStatus.CREATED)
+    create(@Body() createCoffee: CreateCoffeeDto) {
+        return this.coffeesService.create(createCoffee);
     }
 
     @Patch(":id")
-    update(@Param("id") id:String, @Body() body) {
-        return `This will make changes to body with id: ${id}`
+    update(@Param("id") id:String, @Body() updateCoffee: UpdateCoffeeDto) {
+        return this.coffeesService.update(Number(id), updateCoffee);
     }
 
     @Delete(":id")
     remove(@Param("id") id:string) {
-        return `Delete item with id: ${id}`
-    }
-
-    @Get("/pages/curr")
-    @HttpCode(HttpStatus.OK)
-    paginate(@Query('limit') limit, @Query('offset') offset) {
-        return `Limit is ${limit} and offset is ${offset}`
+        return this.coffeesService.remove(Number(id));
     }
 }
