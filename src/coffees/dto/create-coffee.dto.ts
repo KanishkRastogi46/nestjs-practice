@@ -1,16 +1,13 @@
-import { IsString, IsNumber, IsArray } from 'class-validator';
+import { IsString } from 'class-validator';
+import { Flavours } from '../entities/flavour.entity';
 
 export class CreateCoffeeDto {
-    @IsNumber()
-    readonly id: number;
-
     @IsString()
     readonly name: string;
 
     @IsString()
     readonly brand: string;
 
-    @IsArray()
     @IsString({ each: true })
-    readonly flavors: string[];
+    readonly flavours: string[];
 }

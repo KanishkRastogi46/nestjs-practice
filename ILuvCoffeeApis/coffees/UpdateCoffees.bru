@@ -1,0 +1,24 @@
+meta {
+  name: UpdateCoffees
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{BASE_URL}}/coffees/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 2
+}
+
+body:json {
+  {
+    "flavours": [
+      "vanilla",
+      "choco"
+    ]
+  }
+}
