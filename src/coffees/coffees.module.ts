@@ -9,7 +9,8 @@ import { Flavours } from './entities/flavour.entity';
     imports: [
         TypeOrmModule.forFeature([
             Coffees,
-            Flavours
+            Flavours,
+            Event
         ])
     ],
     controllers: [CoffeesController],

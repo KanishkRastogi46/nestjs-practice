@@ -10,8 +10,9 @@ export class Flavours {
     public name: string
 
     @ManyToMany(
-        type  => Coffees,
-        coffees => coffees.flavours
+        _  => Coffees,
+        coffees => coffees.flavours,
+        {onUpdate: 'CASCADE'}
     )
     public coffees: Coffees[]
 }

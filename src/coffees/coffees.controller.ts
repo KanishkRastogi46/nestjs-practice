@@ -2,14 +2,15 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post
 import { CoffeesService } from './coffees.service';
 import { CreateCoffeeDto } from './dto/create-coffee.dto';
 import { UpdateCoffeeDto } from './dto/update-coffee.dto';
+import { PaginationQuery } from 'src/common/dto/pagination-query.dto';
 
 @Controller('coffees')
 export class CoffeesController {
     constructor (private readonly coffeesService: CoffeesService) {}
     
     @Get("")
-    findAll() {
-        return this.coffeesService.findAll();
+    findAll(@Query() query: PaginationQuery) {
+        return this.coffeesService.findAll(query);
     }
 
     @Get(":id")
@@ -25,7 +26,7 @@ export class CoffeesController {
     }
 
     @Patch(":id")
-    update(@Param("id") id:String, @Body() updateCoffee: any) {
+    update(@Param("id") id:String, @Body() updateCoffee: UpdateCoffeeDto) {
         return this.coffeesService.update(Number(id), updateCoffee);
     }
 

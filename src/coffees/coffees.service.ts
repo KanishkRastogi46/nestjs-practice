@@ -2,10 +2,12 @@ import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestj
 import { Coffees } from './entities/coffee.entity';
 import { Flavours } from './entities/flavour.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { CreateCoffeeDto } from './dto/create-coffee.dto';
 import { UpdateCoffeeDto } from './dto/update-coffee.dto';
 import { NotFoundError } from 'rxjs';
+import { PaginationQuery } from 'src/common/dto/pagination-query.dto';
+import { Event } from 'src/event/entities/event.entity';
 
 @Injectable()
 export class CoffeesService {
@@ -14,16 +16,18 @@ export class CoffeesService {
         @InjectRepository(Coffees)
         private readonly coffeeRepository: Repository<Coffees>,
         @InjectRepository(Flavours)
-        private readonly flavourRepository: Repository<Flavours>
+        private readonly flavourRepository: Repository<Flavours>,
+        private readonly connection: Connection
     ) {}
 
-    async findAll() {
+    async findAll(query: PaginationQuery) {
         try {
             return await this.coffeeRepository.find({
-                relations: ['flavours'],
                 order: {
                     id: 'ASC'
-                }
+                },
+                take: query.limit || 2,
+                skip: query.offset || 0
             })
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);            
@@ -101,6 +105,31 @@ export class CoffeesService {
             return this.flavourRepository.create({ name });
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);                        
+        }
+    }
+
+    async recommendations(coffee: Coffees) {
+        const queryRunner = this.connection.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            coffee.recommendations++;
+
+            const recommendedEvent = new Event();
+            recommendedEvent.type = "recommend_coffee";
+            recommendedEvent.name = coffee.name;
+            recommendedEvent.payload = { coffeeId: coffee.id, recommendations: coffee.recommendations };
+
+            await queryRunner.manager.save(coffee);
+            await queryRunner.manager.save(recommendedEvent);
+
+            await queryRunner.commitTransaction();
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        } finally {
+            queryRunner.release();
         }
     }
 }

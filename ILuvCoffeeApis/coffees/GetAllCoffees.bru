@@ -5,7 +5,12 @@ meta {
 }
 
 get {
-  url: {{BASE_URL}}/coffees
+  url: {{BASE_URL}}/coffees?limit=2&offset=1
   body: none
   auth: inherit
+}
+
+params:query {
+  limit: 2
+  offset: 1
 }
