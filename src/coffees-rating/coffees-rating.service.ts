@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { CoffeesService } from 'src/coffees/coffees.service';
 
 @Injectable()
-export class CoffeesRatingService {}
+export class CoffeesRatingService {
+    constructor(
+        private readonly coffeeService: CoffeesService,
+    ) {}
+}

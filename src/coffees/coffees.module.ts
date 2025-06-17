@@ -14,6 +14,13 @@ import { Flavours } from './entities/flavour.entity';
         ])
     ],
     controllers: [CoffeesController],
-    providers: [CoffeesService],
+    providers: [
+        CoffeesService,
+        {
+            provide: 'COFFEE_BRANDS',
+            useFactory: () => ['Buddy Brew', 'Blue Bottle', 'Drip'],
+        }
+    ],
+    exports: [CoffeesService]
 })
 export class CoffeesModule {}

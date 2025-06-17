@@ -1,24 +1,38 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Coffees } from './entities/coffee.entity';
 import { Flavours } from './entities/flavour.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateCoffeeDto } from './dto/create-coffee.dto';
 import { UpdateCoffeeDto } from './dto/update-coffee.dto';
-import { NotFoundError } from 'rxjs';
 import { PaginationQuery } from 'src/common/dto/pagination-query.dto';
 import { Event } from 'src/event/entities/event.entity';
+import { COFFEE_BRANDS } from './coffees.constant';
 
 @Injectable()
 export class CoffeesService {
     
     constructor(
+        /*
+        Injecting the repositories for Coffees and Flavours entities.
+        This allows us to perform CRUD operations on these entities using TypeORM.
+        */
         @InjectRepository(Coffees)
         private readonly coffeeRepository: Repository<Coffees>,
         @InjectRepository(Flavours)
         private readonly flavourRepository: Repository<Flavours>,
-        private readonly connection: Connection
-    ) {}
+
+        /*
+        Injecting the DataSource to manage transactions.
+        This is useful for operations that require multiple database actions to be executed atomically.
+        */
+        private readonly dataSource: DataSource,
+        
+        @Inject(COFFEE_BRANDS)
+        private readonly coffeeBrands: string[],
+    ) {
+        console.log('Coffee Brands: ', this.coffeeBrands);
+    }
 
     async findAll(query: PaginationQuery) {
         try {
@@ -109,7 +123,7 @@ export class CoffeesService {
     }
 
     async recommendations(coffee: Coffees) {
-        const queryRunner = this.connection.createQueryRunner();
+        const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
