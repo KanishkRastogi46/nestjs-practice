@@ -8,6 +8,8 @@ import { UpdateCoffeeDto } from './dto/update-coffee.dto';
 import { PaginationQuery } from 'src/common/dto/pagination-query.dto';
 import { Event } from 'src/event/entities/event.entity';
 import { COFFEE_BRANDS } from './coffees.constant';
+import { ConfigService, ConfigType } from '@nestjs/config';
+import coffeesConfig from './config/coffees.config';
 
 @Injectable()
 export class CoffeesService {
@@ -30,8 +32,14 @@ export class CoffeesService {
         
         @Inject(COFFEE_BRANDS)
         private readonly coffeeBrands: string[],
+
+        private readonly configService: ConfigService,
+
+        @Inject(coffeesConfig.KEY)
+        private readonly coffeesConfigType: ConfigType<typeof coffeesConfig>
     ) {
-        console.log('Coffee Brands: ', this.coffeeBrands);
+       console.log('Coffee Brands:', this.coffeeBrands);
+       console.log(coffeesConfigType.description);
     }
 
     async findAll(query: PaginationQuery) {
@@ -62,7 +70,7 @@ export class CoffeesService {
 
     async create(createCoffeeDto: CreateCoffeeDto) {
         try {
-            const flavours = await Promise.all(
+            const flavours = createCoffeeDto.flavours && await Promise.all(
                 createCoffeeDto.flavours.map(flavourName => this.preloadFlavoursByNames(flavourName))
             );
             const newCoffee = this.coffeeRepository.create(

@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, Res } from '@nestjs/common';
+import { Body,
+    Controller,
+    Delete, 
+    Get, 
+    HttpCode, 
+    HttpStatus, 
+    Param, 
+    ParseIntPipe, 
+    Patch, 
+    Post, 
+    Query,
+} from '@nestjs/common';
 import { CoffeesService } from './coffees.service';
 import { CreateCoffeeDto } from './dto/create-coffee.dto';
 import { UpdateCoffeeDto } from './dto/update-coffee.dto';
@@ -15,19 +26,19 @@ export class CoffeesController {
 
     @Get(":id")
     @HttpCode(HttpStatus.OK)
-    getData(@Param("id") id: string) {
-        return this.coffeesService.findById(Number(id));
+    getData(@Param("id", ParseIntPipe) id: number) {
+        return this.coffeesService.findById(id);
     }
 
-    @Post("create")
+    @Post("")
     @HttpCode(HttpStatus.CREATED)
     create(@Body() createCoffee: CreateCoffeeDto) {
         return this.coffeesService.create(createCoffee);
     }
 
     @Patch(":id")
-    update(@Param("id") id:String, @Body() updateCoffee: UpdateCoffeeDto) {
-        return this.coffeesService.update(Number(id), updateCoffee);
+    update(@Param("id", ParseIntPipe) id: number, @Body() updateCoffee: UpdateCoffeeDto) {
+        return this.coffeesService.update(id, updateCoffee);
     }
 
     @Delete(":id")
