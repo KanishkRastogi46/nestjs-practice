@@ -1,0 +1,4 @@
+@BASE_URL = http://localhost:3000
+
+GET {{BASE_URL}}/coffees?limit=2&offset=1
+Accept: application/json

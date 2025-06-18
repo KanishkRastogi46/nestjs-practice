@@ -1,0 +1,10 @@
+@BASE_URL = http://localhost:3000
+
+POST {{BASE_URL}}/coffees
+Content-Type: application/json
+
+{
+    "name": "Cappuccino",
+    "brand": "Brand B",
+    "flavours": ["bitter", "strong"]
+}
