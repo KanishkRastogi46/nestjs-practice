@@ -13,8 +13,9 @@ import { CoffeesService } from './coffees.service';
 import { CreateCoffeeDto } from './dto/create-coffee.dto';
 import { UpdateCoffeeDto } from './dto/update-coffee.dto';
 import { PaginationQuery } from 'src/common/dto/pagination-query.dto';
-import { Public } from 'src/common/decorators/public.decorators';
+import { Public } from 'src/common/decorators/public.decorator';
 import { ParseIntPipe } from 'src/common/pipes/int-parse.pipe';
+import { ProtocolDecorator } from 'src/common/decorators/protocol.decorator';
 
 @Controller('coffees')
 export class CoffeesController {
@@ -22,7 +23,8 @@ export class CoffeesController {
     
     @Public()
     @Get("")
-    findAll(@Query() query: PaginationQuery) {
+    findAll(@ProtocolDecorator('https') protocol: string, @Query() query: PaginationQuery) {
+        console.log(`Protocol used: ${protocol}`);
         return this.coffeesService.findAll(query);
     }
 

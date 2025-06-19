@@ -3,7 +3,7 @@ module.exports = {
     host: 'localhost',
     port: 5432,
     username: 'postgres',
-    password: 'root',
+    password: '1234',
     database: 'postgres',
     entities: [
         'dist/**/*.entity.js'
