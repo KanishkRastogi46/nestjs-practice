@@ -4,8 +4,7 @@ import { Body,
     Get, 
     HttpCode, 
     HttpStatus, 
-    Param, 
-    ParseIntPipe, 
+    Param,
     Patch, 
     Post, 
     Query,
@@ -15,6 +14,7 @@ import { CreateCoffeeDto } from './dto/create-coffee.dto';
 import { UpdateCoffeeDto } from './dto/update-coffee.dto';
 import { PaginationQuery } from 'src/common/dto/pagination-query.dto';
 import { Public } from 'src/common/decorators/public.decorators';
+import { ParseIntPipe } from 'src/common/pipes/int-parse.pipe';
 
 @Controller('coffees')
 export class CoffeesController {
