@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CoffeesRatingModule } from './coffees-rating/coffees-rating.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
+import { CommonModule } from './common/common.module';
 import * as Joi from '@hapi/joi';
 import appConfig from './config/app.config';
 
@@ -37,7 +38,8 @@ import appConfig from './config/app.config';
     }),
     CoffeesModule,
     CoffeesRatingModule, 
-    DatabaseModule
+    DatabaseModule, 
+    CommonModule
   ],
   controllers: [AppController],
   providers: [

@@ -48,7 +48,7 @@ export class CoffeesService {
                 order: {
                     id: 'ASC'
                 },
-                take: query.limit || 2,
+                take: query.limit || undefined,
                 skip: query.offset || 0
             })
         } catch (error) {

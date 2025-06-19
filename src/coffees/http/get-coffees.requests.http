@@ -2,4 +2,3 @@
 
 GET {{BASE_URL}}/coffees?limit=2&offset=1
 Accept: application/json
-X-API-Key: api_key

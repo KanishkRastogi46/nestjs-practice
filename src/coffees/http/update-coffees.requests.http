@@ -1,0 +1,10 @@
+@BASE_URL = http://localhost:3000
+
+PATCH {{BASE_URL}}/coffees/3
+Content-Type: application/json
+X-Api-Key: api_key
+
+{
+  "name": "Coffee 3",
+  "brand": "Brand A"
+}
