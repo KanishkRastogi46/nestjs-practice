@@ -5,6 +5,7 @@ import { Coffees, CoffeeSchema } from './entities/coffee.entity';
 import { ConfigModule } from '@nestjs/config';
 import coffeesConfig from './config/coffees.config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Event, EventSchema } from 'src/event/entities/event.entity';
 
 @Module({
     imports: [
@@ -12,6 +13,10 @@ import { MongooseModule } from '@nestjs/mongoose';
             {
                 name: Coffees.name,
                 schema: CoffeeSchema
+            },
+            {
+                name: Event.name,
+                schema: EventSchema
             }
         ]),
         ConfigModule.forFeature(coffeesConfig)

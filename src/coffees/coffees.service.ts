@@ -6,8 +6,9 @@ import { PaginationQuery } from 'src/common/dto/pagination-query.dto';
 import { COFFEE_BRANDS } from './coffees.constant';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import coffeesConfig from './config/coffees.config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { Connection, Model } from 'mongoose';
+import { Event } from 'src/event/entities/event.entity';
 
 @Injectable()
 export class CoffeesService {
@@ -23,9 +24,13 @@ export class CoffeesService {
         // private readonly flavourRepository: Repository<Flavours>,
 
         /*
-        Injecting the DataSource to manage transactions.
-        This is useful for operations that require multiple database actions to be executed atomically.
+        Injecting Event Model to handle events related to coffees.
         */
+        @InjectModel(Event.name)
+        private readonly eventModel: Model<Event>,
+
+        @InjectConnection()
+        private readonly connection: Connection,
         
         @Inject(COFFEE_BRANDS)
         private readonly coffeeBrands: string[],
@@ -36,7 +41,7 @@ export class CoffeesService {
         private readonly coffeesConfigType: ConfigType<typeof coffeesConfig>
     ) {
        console.log('Coffee Brands:', this.coffeeBrands);
-       console.log(coffeesConfigType.description);
+       console.log(this.coffeesConfigType.description);
     }
 
     async findAll(query: PaginationQuery) {
@@ -97,4 +102,28 @@ export class CoffeesService {
         }
     }
 
+    async recommendations(coffee: Coffees) {
+        const session = await this.connection.startSession();
+        session.startTransaction();
+
+        try {
+            coffee.recommendations++;
+            const newEvent = new this.eventModel({
+                type: 'coffee-recommendation',
+                name: coffee.name,
+                payload: {
+                    coffeeId: coffee._id
+                }
+            })
+
+            await coffee.save({ session });
+            await newEvent.save({ session });
+
+            await session.commitTransaction();
+        } catch (error) {
+            session.abortTransaction();                        
+        } finally {
+            session.endSession();
+        }
+    }
 }

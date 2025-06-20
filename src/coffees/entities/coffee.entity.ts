@@ -3,13 +3,16 @@ import { Document } from "mongoose";
 
 @Schema()
 export class Coffees extends Document {
-    @Prop()
+    @Prop({ required: true })
     name: string;
 
-    @Prop()
+    @Prop({ required: true })
     brand: string;
 
-    @Prop([String])
+    @Prop({default: 0})
+    recommendations: number;
+
+    @Prop({ type: [String], default: [] })
     flavours: string[];
 }
 
