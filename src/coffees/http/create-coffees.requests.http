@@ -2,9 +2,10 @@
 
 POST {{BASE_URL}}/coffees
 Content-Type: application/json
+X-Api-Key: api_key
 
 {
-    "name": "Cappuccino",
+    "name": "Capuccino",
     "brand": "Brand B",
-    "flavours": ["bitter", "strong"]
+    "flavours": ["sweet", "lite"]
 }

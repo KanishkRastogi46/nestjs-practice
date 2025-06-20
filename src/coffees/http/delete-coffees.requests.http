@@ -1,5 +1,5 @@
 @BASE_URL = http://localhost:3000
 
-GET {{BASE_URL}}/coffees
+DELETE {{BASE_URL}}/coffees/6854faed73b8f95625fe008e
 Accept: application/json
 X-Api-Key: api_key

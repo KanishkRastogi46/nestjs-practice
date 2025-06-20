@@ -1,6 +1,6 @@
 @BASE_URL = http://localhost:3000
 
-PATCH {{BASE_URL}}/coffees/3
+PATCH {{BASE_URL}}/coffees/6854faed73b8f95625fe008e
 Content-Type: application/json
 X-Api-Key: api_key
 

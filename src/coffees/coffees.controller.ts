@@ -30,7 +30,7 @@ export class CoffeesController {
 
     @Get(":id")
     @HttpCode(HttpStatus.OK)
-    getData(@Param("id", ParseIntPipe) id: number) {
+    getData(@Param("id") id: string) {
         return this.coffeesService.findById(id);
     }
 
@@ -41,12 +41,12 @@ export class CoffeesController {
     }
 
     @Patch(":id")
-    update(@Param("id", ParseIntPipe) id: number, @Body() updateCoffee: UpdateCoffeeDto) {
+    update(@Param("id") id: string, @Body() updateCoffee: UpdateCoffeeDto) {
         return this.coffeesService.update(id, updateCoffee);
     }
 
     @Delete(":id")
     remove(@Param("id") id:string) {
-        return this.coffeesService.remove(Number(id));
+        return this.coffeesService.remove(id);
     }
 }
