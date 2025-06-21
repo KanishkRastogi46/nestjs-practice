@@ -1,10 +1,13 @@
-import { ConflictException, HttpException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, HttpException, Inject, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { HashingService } from '../providers/hashing.service';
 import { SignUpDtoTs } from './dto/sign-up.dto.ts';
 import { SignInDtoTs } from './dto/sign-in.dto.ts';
+import { JwtService } from '@nestjs/jwt';
+import jwtConfig from '../config/jwt.config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class AuthenticationService {
@@ -12,7 +15,12 @@ export class AuthenticationService {
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
 
-        private readonly hashingService: HashingService
+        private readonly hashingService: HashingService,
+
+        private readonly jwtService: JwtService,
+        
+        @Inject(jwtConfig.KEY)
+        private readonly jwtConfiguration: ConfigType<typeof jwtConfig>
     ) {}
 
     async signup(signupDto: SignUpDtoTs) {
@@ -48,7 +56,20 @@ export class AuthenticationService {
                 throw new UnauthorizedException(`Invalid credentials for email ${signInDto.email}`);
             }
 
-            return true;
+            const accessToken = await this.jwtService.signAsync(
+                { 
+                    sub: isUserExists.id,
+                    email: isUserExists.email
+                },
+                {
+                    secret: this.jwtConfiguration.secret,
+                    audience: this.jwtConfiguration.audience,
+                    issuer: this.jwtConfiguration.issuer,
+                    expiresIn: this.jwtConfiguration.accessTokenTtl
+                }
+            )
+
+            return accessToken;
         } catch (error) {
             throw new InternalServerErrorException('An error occurred while signing in');
         }
