@@ -38,8 +38,8 @@ export class CoffeesService {
         @Inject(coffeesConfig.KEY)
         private readonly coffeesConfigType: ConfigType<typeof coffeesConfig>
     ) {
-       console.log('Coffee Brands:', this.coffeeBrands);
-       console.log(coffeesConfigType.description);
+    //    console.log('Coffee Brands:', this.coffeeBrands);
+    //    console.log(coffeesConfigType.description);
     }
 
     async findAll(query: PaginationQuery) {

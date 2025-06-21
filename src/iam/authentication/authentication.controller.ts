@@ -12,7 +12,10 @@ import { AuthenticationService } from './authentication.service';
 import { SignUpDtoTs } from './dto/sign-up.dto.ts';
 import { SignInDtoTs } from './dto/sign-in.dto.ts';
 import { Response } from 'express';
+import { AuthDecorator } from './decorators/auth-type.decorator';
+import { AuthType } from './enums/auth-type.enum';
 
+@AuthDecorator(AuthType.None)
 @Controller('auth')
 export class AuthenticationController {
     constructor(
@@ -40,9 +43,6 @@ export class AuthenticationController {
                 sameSite: 'strict', // Adjust as necessary for your application
                 maxAge: 60 * 60 * 1000 // 1 hour
             })
-            return {
-                message: 'Sign-in successful'
-            }
         } catch (error) {
             throw new InternalServerErrorException('An error occurred during sign-in');
         }

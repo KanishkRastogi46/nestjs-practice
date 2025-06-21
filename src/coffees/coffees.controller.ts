@@ -8,22 +8,32 @@ import { Body,
     Patch, 
     Post, 
     Query,
+    Req,
 } from '@nestjs/common';
 import { CoffeesService } from './coffees.service';
 import { CreateCoffeeDto } from './dto/create-coffee.dto';
 import { UpdateCoffeeDto } from './dto/update-coffee.dto';
 import { PaginationQuery } from 'src/common/dto/pagination-query.dto';
-import { Public } from 'src/common/decorators/public.decorator';
 import { ParseIntPipe } from 'src/common/pipes/int-parse.pipe';
 import { ProtocolDecorator } from 'src/common/decorators/protocol.decorator';
+import { Request } from 'express';
+import { AuthDecorator } from 'src/iam/authentication/decorators/auth-type.decorator';
+import { AuthType } from 'src/iam/authentication/enums/auth-type.enum';
+import { ActiveUser } from 'src/iam/authentication/decorators/active-user.decorator';
+import { ActiveUserData } from 'src/iam/authentication/interfaces/active-user.interface';
 
+@AuthDecorator(AuthType.Bearer)
 @Controller('coffees')
 export class CoffeesController {
     constructor (private readonly coffeesService: CoffeesService) {}
     
-    @Public()
     @Get("")
-    findAll(@ProtocolDecorator('https') protocol: string, @Query() query: PaginationQuery) {
+    findAll(
+        @ProtocolDecorator('https') protocol: string, 
+        @Query() query: PaginationQuery,
+        @ActiveUser() user: ActiveUserData
+    ) {
+        console.log(`Sub: ${user.sub}, Email: ${user.email}`); 
         console.log(`Protocol used: ${protocol}`);
         return this.coffeesService.findAll(query);
     }

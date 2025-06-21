@@ -8,6 +8,7 @@ import { SignInDtoTs } from './dto/sign-in.dto.ts';
 import { JwtService } from '@nestjs/jwt';
 import jwtConfig from '../config/jwt.config';
 import { ConfigType } from '@nestjs/config';
+import { ActiveUserData } from './interfaces/active-user.interface';
 
 @Injectable()
 export class AuthenticationService {
@@ -60,7 +61,7 @@ export class AuthenticationService {
                 { 
                     sub: isUserExists.id,
                     email: isUserExists.email
-                },
+                } as ActiveUserData,
                 {
                     secret: this.jwtConfiguration.secret,
                     audience: this.jwtConfiguration.audience,
