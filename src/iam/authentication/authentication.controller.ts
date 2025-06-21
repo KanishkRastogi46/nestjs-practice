@@ -14,6 +14,7 @@ import { SignInDtoTs } from './dto/sign-in.dto.ts';
 import { Response } from 'express';
 import { AuthDecorator } from './decorators/auth-type.decorator';
 import { AuthType } from './enums/auth-type.enum';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @AuthDecorator(AuthType.None)
 @Controller('auth')
@@ -33,8 +34,8 @@ export class AuthenticationController {
         @Res({ passthrough: true}) res: Response,
         @Body() signInDto: SignInDtoTs) {
         try {
-            const accessToken = await this.authenticationService.signIn(signInDto);
-            if (!accessToken) {
+            const { accessToken, refreshToken } = await this.authenticationService.signIn(signInDto);
+            if (!accessToken || !refreshToken) {
                 throw new UnauthorizedException('Invalid credentials');
             }
             res.cookie('accessToken', accessToken, {
@@ -43,8 +44,22 @@ export class AuthenticationController {
                 sameSite: 'strict', // Adjust as necessary for your application
                 maxAge: 60 * 60 * 1000 // 1 hour
             })
+            .cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+                sameSite: 'strict', // Adjust as necessary for your application
+                maxAge: 24 * 60 * 60 * 1000 // 1 day
+            });
         } catch (error) {
             throw new InternalServerErrorException('An error occurred during sign-in');
         }
+    }
+
+    @Post('refresh-tokens')
+    refreshTokens(
+        @Res({ passthrough: true }) res: Response,
+        @Body() refreshToken: RefreshTokenDto
+    ) {
+        return this.authenticationService.refreshTokens(refreshToken)
     }
 }
