@@ -3,6 +3,7 @@
 /node_modules
 /build
 
+datasource.ts
 # Logs
 logs
 *.log

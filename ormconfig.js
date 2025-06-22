@@ -1,9 +1,9 @@
-module.exports = {
+const options = {
     type: 'postgres',
     host: 'localhost',
     port: 5432,
     username: 'postgres',
-    password: '1234',
+    password: 'root',
     database: 'postgres',
     entities: [
         'dist/**/*.entity.js'
@@ -11,7 +11,9 @@ module.exports = {
     migrations: [
         'dist/migrations/*.js'
     ],
-    cli: {
-        migrationsDir: 'src/migrations'
-    } 
+    // cli: {
+    //     migrationsDir: 'src/migrations'
+    // } 
 }
+
+export default options

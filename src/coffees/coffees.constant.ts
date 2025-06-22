@@ -1,1 +1,5 @@
-export const COFFEE_BRANDS = 'COFFEE_BRANDS';
+export const COFFEE_BRANDS = 'COFFEE_BRANDS'
+export const COFFEE_PERMISSIONS_KEY = 'permissions'
+export const COFFEE_PERMISSIONS_CREATE = 'create'
+export const COFFEE_PERMISSIONS_UPDATE = 'update'
+export const COFFEE_PERMISSIONS_DELETE = 'delete'

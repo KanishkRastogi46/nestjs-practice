@@ -1,0 +1,7 @@
+import { COFFEE_PERMISSIONS_CREATE, COFFEE_PERMISSIONS_DELETE, COFFEE_PERMISSIONS_UPDATE } from "./coffees.constant";
+
+export enum CoffeesPermission {
+    Create = COFFEE_PERMISSIONS_CREATE,
+    Update = COFFEE_PERMISSIONS_UPDATE,
+    Delete = COFFEE_PERMISSIONS_DELETE
+}

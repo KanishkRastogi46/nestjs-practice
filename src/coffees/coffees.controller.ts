@@ -1,4 +1,5 @@
-import { Body,
+import { 
+    Body,
     Controller,
     Delete, 
     Get, 
@@ -21,6 +22,10 @@ import { AuthDecorator } from 'src/iam/authentication/decorators/auth-type.decor
 import { AuthType } from 'src/iam/authentication/enums/auth-type.enum';
 import { ActiveUser } from 'src/iam/authentication/decorators/active-user.decorator';
 import { ActiveUserData } from 'src/iam/authentication/interfaces/active-user.interface';
+import { RolesDecorator } from 'src/iam/authorization/decorators/roles.decorator';
+import { Roles } from 'src/users/enums/roles.enum';
+import { PermissionsDecorator } from 'src/iam/authorization/decorators/permissions.decorator';
+import { CoffeesPermission } from './coffees.permission';
 
 @AuthDecorator(AuthType.Bearer)
 @Controller('coffees')
@@ -44,17 +49,22 @@ export class CoffeesController {
         return this.coffeesService.findById(id);
     }
 
+    // @RolesDecorator(Roles.Admin)
+    @PermissionsDecorator(CoffeesPermission.Create, CoffeesPermission.Update)
     @Post("")
     @HttpCode(HttpStatus.CREATED)
     create(@Body() createCoffee: CreateCoffeeDto) {
         return this.coffeesService.create(createCoffee);
     }
 
+    // @RolesDecorator(Roles.Admin)
+    @PermissionsDecorator(CoffeesPermission.Create, CoffeesPermission.Update)
     @Patch(":id")
     update(@Param("id", ParseIntPipe) id: number, @Body() updateCoffee: UpdateCoffeeDto) {
         return this.coffeesService.update(id, updateCoffee);
     }
 
+    @RolesDecorator(Roles.Admin)
     @Delete(":id")
     remove(@Param("id") id:string) {
         return this.coffeesService.remove(Number(id));
