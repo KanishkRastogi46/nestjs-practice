@@ -18,6 +18,7 @@ import jwtConfig from '../config/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { ActiveUserData } from './interfaces/active-user.interface';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { InvalidRefreshTokenException, RefreshTokensIdsStorage } from './refresh-tokens-ids.storage';
 
 @Injectable()
 export class AuthenticationService {
@@ -30,7 +31,9 @@ export class AuthenticationService {
         private readonly jwtService: JwtService,
         
         @Inject(jwtConfig.KEY)
-        private readonly jwtConfiguration: ConfigType<typeof jwtConfig>
+        private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+
+        private readonly refreshTokenStorage: RefreshTokensIdsStorage
     ) {}
 
     async signup(signupDto: SignUpDtoTs) {
@@ -66,25 +69,7 @@ export class AuthenticationService {
                 throw new UnauthorizedException(`Invalid credentials for email ${signInDto.email}`);
             }
 
-            const [accessToken, refreshToken] = await Promise.all(
-                [
-                    this.signToken<Partial<ActiveUserData>>(
-                        user.id, 
-                        this.jwtConfiguration.accessTokenTtl, 
-                        { email: user.email }
-                    ),
-
-                    this.signToken<Partial<ActiveUserData>>(
-                        user.id, 
-                        this.jwtConfiguration.refreshTokenTtl,
-                    )
-                ]
-            )
-
-            return {
-                accessToken,
-                refreshToken
-            }
+            return await this.generateTokens(user);
         } catch (error) {
             throw new InternalServerErrorException('An error occurred while signing in');
         }
@@ -92,8 +77,8 @@ export class AuthenticationService {
 
     async refreshTokens(refreshTokenDto: RefreshTokenDto) {
         try {
-            const { sub } = await this.jwtService.verifyAsync<
-            Pick<ActiveUserData, 'sub'>
+            const { sub, refreshTokenId } = await this.jwtService.verifyAsync<
+            Pick<ActiveUserData, 'sub'> & { refreshTokenId: string}
             >(
                 refreshTokenDto.refreshToken,
                 {
@@ -104,18 +89,29 @@ export class AuthenticationService {
             )
 
             const user = await this.userRepository.findOneByOrFail({ id: sub })
-            const { accessToken, refreshToken } = await this.generateTokens(user)
-            return {
-                accessToken,
-                refreshToken
+            const isTokenValid = await this.refreshTokenStorage.validate(
+                user.id, 
+                refreshTokenId
+            )
+            if (isTokenValid) {
+                await this.refreshTokenStorage.inValidate(user.id)
+            } else {
+                return new UnauthorizedException('Invalid refresh token');
             }
+
+            return await this.generateTokens(user);
         } catch (error) {
+            if (error instanceof InvalidRefreshTokenException) {
+                throw new UnauthorizedException('Invalid refresh token');
+            }
             throw new InternalServerErrorException('An error occurred while refreshing tokens');           
         }
     }
 
     async generateTokens(user: User) {
         try {
+            const refreshTokenId = crypto.randomUUID()
+
             const [accessToken, refreshToken] = await Promise.all(
                 [
                     this.signToken<Partial<ActiveUserData>>(
@@ -124,12 +120,14 @@ export class AuthenticationService {
                         { email: user.email }
                     ),
 
-                    this.signToken<Partial<ActiveUserData>>(
+                    this.signToken(
                         user.id, 
                         this.jwtConfiguration.refreshTokenTtl,
+                        { refreshTokenId }
                     )
                 ]
             )
+            await this.refreshTokenStorage.insert(user.id, refreshTokenId)
 
             return {
                 accessToken,

@@ -38,18 +38,10 @@ export class AuthenticationController {
             if (!accessToken || !refreshToken) {
                 throw new UnauthorizedException('Invalid credentials');
             }
-            res.cookie('accessToken', accessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-                sameSite: 'strict', // Adjust as necessary for your application
-                maxAge: 60 * 60 * 1000 // 1 hour
-            })
-            .cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-                sameSite: 'strict', // Adjust as necessary for your application
-                maxAge: 24 * 60 * 60 * 1000 // 1 day
-            });
+            return {
+                accessToken,
+                refreshToken
+            }
         } catch (error) {
             throw new InternalServerErrorException('An error occurred during sign-in');
         }
